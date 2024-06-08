@@ -1,3 +1,4 @@
+import textwrap
 from abc import ABC, abstractclassmethod, abstractproperty
 from datetime import datetime
 
@@ -152,15 +153,64 @@ class Saque(Transacao):
             conta.historico.adicionar_transacao(self)
 
 class Deposito(Transacao):
-    def __init__(self, valor):
-        self._valor = valor
+    
+
+def menu():
+    menu = """\n
+    ============= Menu =================
+    [d]\tDepositar
+    [s]\tSacar
+    [e]\tExtrato
+    [nc]\tNova conta
+    [lc]\tListar contas
+    [nu]\tNovo usuario
+    [q]\tsair
+    => """
+    return input(textwrap.dedent(menu))
+
+def depositar(clientes):
+    cpf = input("Informe o CPF do cliente: ")
+    cliente = filtrar_cliente(cpf, clientes)
+    
+    if not cliente:
+        print("\n@@@ Cliente não encontrado! @@@")
+        return
+    valor = float(input("Informe o valor do depósito: "))
+    transacao = Deposito(valor)
+    
+    conta = recuperar_conta_cliente(cliente)
+    if not conta:
+        return
+    
+    cliente.realizar_transacao(conta, transacao)
+def main():
+    cliente = []
+    contas = []
+    
+    while True:
+        opcao = menu()
         
-        @property
-        def valor(self):
-            return self._valor
-        
-        def registrar(self, conta):
-            sucesso_transacao = conta.depositar(self.valor)
+        if opcao.lower() == "d":
+            depositar(clientes)
             
-            if sucesso_transacao:
-                conta.historico.adicionar_transacao(self)
+        elif opcao.lower() == "s":
+            sacar(clientes)
+        
+        elif opcao.lower() == "e":
+            exibir_extrato(clientes)
+        
+        elif opcao.lower() == "nu":
+            criar_usuario(clientes)
+        
+        elif opcao.lower() == "nc":
+            numero_conta = len(contas) + 1
+            criar_conta(numero_conta, clientes, contas)
+        
+        elif opcao.lower() == "lc":
+            listar_contas(contas)
+        
+        elif opcao.lower() == "q":
+            break
+        
+        else:
+            print  (f"Opção inválida!, Por favor selecione novamente a operação desejada.")
