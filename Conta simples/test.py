@@ -168,6 +168,18 @@ def menu():
     => """
     return input(textwrap.dedent(menu))
 
+def filtrar_cliente(cpf, clientes):
+    clientes_filtrados = [cliente for clientte in clientes if cliente.cpf == cpf]
+    return clientes_filtrados[0] if clientes_filtrados else None
+
+def recuperar_conta_cliente(Cliente):
+    if not Cliente.contas:
+        print("\n@@@ clinetece não possui conta! @@@")
+        return
+    
+    # FIXME: não permite cliente escolher a conta
+        return Cliente.contas[0]
+
 def depositar(clientes):
     cpf = input("Informe o CPF do cliente: ")
     cliente = filtrar_cliente(cpf, clientes)
@@ -183,6 +195,50 @@ def depositar(clientes):
         return
     
     cliente.realizar_transacao(conta, transacao)
+    
+
+def sacar(clientes):
+    cpf = input("Informe o CPF do cliente: ")
+    cliente = filtrar_cliente(cpf, clientes)
+    
+    if not cliente:
+        print("\n@@@ Cliente não encontrado! @@@")
+        return
+    valor = float(input("Informe o valor do saque: "))
+    transacao = Saque(valor)
+    
+    conta = recuperar_conta_cliente(cliente)
+    if not conta:
+        return
+    
+    cliente.realizar_transacao(conta, transacao)
+
+def exibir_extrato(clientes):
+    cpf =input("Informe o CPF do cliente: ")
+    cliente = filtrar_cliente(cpf, clientes)
+    
+    if not cliente:
+        print("\n@@@ Cliente não encontrado! @@@")
+        return
+    
+    conta = recuperar_conta_cliente(cliente)
+    if not conta:
+        return
+    
+    print("\n====================== EXTRATO ======================")
+    transacoes = conta.historico.transacoes
+    
+    extrato = ""
+    if not transacoes:
+        extrato = "Não foram realizadas movimentações."
+    else:
+        for trasacao in transacoes:
+            extrato += f"\n{trasacao['tipo']}:\n\tR${trasacao['valor']:.2f}"
+    
+    print(extrato)
+    print(f"\nSaldo:\n\tR$ {conta.saldo:.2f}")
+    print("====================================================")
+            
 def main():
     cliente = []
     contas = []
